@@ -327,3 +327,21 @@ if st.button("View Past Reels"):
             st.divider()
     else:
         st.info("No reels generated yet.")
+
+with open(output_path, "rb") as f:
+    st.download_button(
+        label="Download Reel",
+        data=f,
+        file_name=filename,
+        mime="video/mp4"
+    )
+
+if reel["output_path"] and Path(reel["output_path"]).exists():
+    st.video(reel["output_path"])
+    with open(reel["output_path"], "rb") as f:
+        st.download_button(
+            label="Download Reel",
+            data=f,
+            file_name=Path(reel["output_path"]).name,
+            mime="video/mp4"
+        )
