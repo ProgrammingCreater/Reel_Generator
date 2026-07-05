@@ -316,32 +316,29 @@ if st.button("Render Reel"):
 
 st.header("4 · Reel History")
 
-if st.button("View Past Reels"):
-    reels = db.get_all_reels()
-    if reels:
-        for reel in reels:
-            st.write(f"**#{reel['id']}** — {reel['created_time']}")
-            st.write(f"Output: `{reel['output_path']}`")
-            if reel["output_path"] and Path(reel["output_path"]).exists():
-                st.video(reel["output_path"])
-            st.divider()
+if st.button("Render Reel"):
+    if "current_recipe" not in st.session_state:
+        st.warning("Build a recipe first.")
     else:
-        st.info("No reels generated yet.")
+        recipe   = st.session_state.current_recipe
+        filename = f"reel_{int(time.time())}.mp4"
 
-with open(output_path, "rb") as f:
-    st.download_button(
-        label="Download Reel",
-        data=f,
-        file_name=filename,
-        mime="video/mp4"
-    )
+        with st.spinner("Rendering… this may take a minute for longer reels."):
+            output_path, error = assembleReel(recipe, filename)
 
-if reel["output_path"] and Path(reel["output_path"]).exists():
-    st.video(reel["output_path"])
-    with open(reel["output_path"], "rb") as f:
-        st.download_button(
-            label="Download Reel",
-            data=f,
-            file_name=Path(reel["output_path"]).name,
-            mime="video/mp4"
-        )
+        if error:
+            st.error(f"Render failed: {error}")
+        else:
+            db.save_reel(recipeToJson(recipe), output_path)
+            for segment in recipe:
+                db.increment_usage(segment["clip_id"])
+
+            st.success(f"Reel saved → {output_path}")
+            st.video(output_path)
+            with open(output_path, "rb") as f:       # ← inside the block
+                st.download_button(
+                    label="Download Reel",
+                    data=f,
+                    file_name=filename,
+                    mime="video/mp4"
+                )
