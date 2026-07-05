@@ -191,7 +191,16 @@ if st.button("Submit Music"):
             f"{skipped} skipped."
         )
 
-
+if st.button("Remove Music"):
+    for file in Path("databases/music").iterdir():
+        if file.is_file():
+            file.unlink()
+    db.clear_all()
+    # Reset any recipe held in session state too
+    st.session_state.pop("current_recipe", None)
+    st.session_state.confirm_clear = False
+    st.success("Music Library cleared.")
+    
 # ================================================================== #
 #  SECTION 2 — Media library                                          #
 # ================================================================== #
