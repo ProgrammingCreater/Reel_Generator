@@ -24,10 +24,16 @@ VIDEO_TYPES = [".mp4", ".mov", ".avi"]
 #  Helper functions                                                    #
 # ------------------------------------------------------------------ #
 
-def saveFileToDisk(file):
-    folder = Path("databases/inputs")
+def saveFileToDisk(file, type):
+    if type == "inputs":
+        folder = Path("databases/inputs")
+        dest = folder / file.name
+    elif type == "music":
+        folder = Path("databases/music")
+        dest = folder / file.name
+
     folder.mkdir(parents=True, exist_ok=True)
-    dest = folder / file.name
+    
     if not dest.exists():
         with open(dest, "wb") as f:
             f.write(file.read())
@@ -57,8 +63,8 @@ def getVideoDuration(file_path):
         return None
 
 
-def importFile(file, db):
-    path       = saveFileToDisk(file)
+def importFile(file, db, type = "inputs"):
+    path       = saveFileToDisk(file, type)
     media_id   = hashlib.md5(path.encode()).hexdigest()
     media_type = getMediaType(file.name)
 
@@ -143,6 +149,41 @@ if st.button("Submit Files"):
             else:
                 skipped += 1
             progress.progress((i + 1) / len(files))
+
+        st.success(
+            f"Done — {added} imported, "
+            f"{duplicates} already existed, "
+            f"{skipped} skipped."
+        )
+
+# Music
+musicFiles = st.file_uploader(
+    "Upload music",
+    accept_multiple_files=True,
+    type=["mp3", "mp4"]
+)
+
+if musicFiles:
+    st.write(f"{len(musicFiles)} file(s) selected:")
+    for f in musicFiles:
+        st.write(f"  - {f.name}  ({round(f.size / 1024)} KB)")
+
+if st.button("Submit Music"):
+    if not musicFiles:
+        st.warning("No music selected — upload something first.")
+    else:
+        added = duplicates = skipped = 0
+        progress = st.progress(0)
+
+        for i, file in enumerate(musicFiles):
+            result = importFile(file, db, "music")
+            if result == "added":
+                added += 1
+            elif result == "duplicate":
+                duplicates += 1
+            else:
+                skipped += 1
+            progress.progress((i + 1) / len(musicFiles))
 
         st.success(
             f"Done — {added} imported, "
