@@ -10,8 +10,8 @@ import random
 
 # On Mac (after `brew install ffmpeg`) change both of these to just "ffmpeg"
 # and "ffprobe". On Windows, point to the full path of your ffmpeg bin folder.
-FFMPEG_PATH  = "C:\\Users\\shaya\\Downloads\\PYPY\\ffmpeg-8.1.1-full_build\\ffmpeg-8.1.1-full_build\\bin\\ffmpeg.exe"   # replace with full path on Windows
-FFPROBE_PATH = "C:\\Users\\shaya\\Downloads\\PYPY\\ffmpeg-8.1.1-full_build\\ffmpeg-8.1.1-full_build\\bin\\ffprobe.exe"  # replace with full path on Windows
+FFMPEG_PATH  = "ffmpeg"   # replace with full path on Windows
+FFPROBE_PATH = "ffprobe"  # replace with full path on Windows
 
 # Example Windows paths — uncomment and update if needed:
 # FFMPEG_PATH  = "C:\\ffmpeg\\bin\\ffmpeg.exe"
